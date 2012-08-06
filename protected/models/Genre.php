@@ -11,38 +11,45 @@
  * @property Genre[] $genres
  * @property Song[] $songs
  */
-class Genre extends CActiveRecord {
-	public static function model($className = __CLASS__) {
+class Genre extends CActiveRecord
+{
+	public static function model($className = __CLASS__)
+    {
 		return parent::model($className);
 	}
 
-	public function tableName() {
+	public function tableName()
+    {
 		return 'genre';
 	}
 
-	public function rules() {
+	public function rules()
+    {
 		return array(
 			array('id, name', 'safe', 'on' => 'search'),
 		);
 	}
 
-	public function relations() {
+	public function relations()
+    {
 		return array(
-			'songs' => array(self::MANY_MANY, 'Song', 'song_genre(genre_id, song_id)'),
+			'songs'  => array(self::MANY_MANY, 'Song', 'song_genre(genre_id, song_id)'),
 			'parent' => array(self::BELONGS_TO, 'Genre', 'parent_id'),
 			'genres' => array(self::HAS_MANY, 'Genre', 'parent_id'),
 		);
 	}
 
-	public function attributeLabels() {
+	public function attributeLabels()
+    {
 		return array(
-			'id' => 'Genre ID',
+			'id'        => 'Genre ID',
 			'parent_id' => 'Parent ID',
-			'name' => 'Genre',
+			'name'      => 'Genre',
 		);
 	}
 
-	public function search() {
+	public function search()
+    {
 		$criteria = new CDbCriteria;
 
 		$criteria->compare('id', $this->id, true);

@@ -50,6 +50,19 @@ class KeenActiveDataProvider extends CActiveDataProvider
 
     private $_withKeenLoading = array();
 
+    /**
+     * Constructor.
+     * Can change $config, before calling CActiveDataProvider's __construct.
+     * @param mixed $modelClass the model class (e.g. 'Post') or the model finder instance
+     * (e.g. <code>Post::model()</code>, <code>Post::model()->published()</code>).
+     * @param array $config configuration (name=>value) to be applied as the initial property values of this class.
+     */
+    public function __construct($modelClass, $config=array())
+    {
+        tr('constructing!','constructing!');
+        parent::__construct($modelClass, $config);
+    }
+    
     /*
      * Specifies which related objects should be Keenly loaded.
      * This method takes variable number of parameters. Each parameter specifies

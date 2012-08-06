@@ -12,37 +12,44 @@
  * @property Review[] $reviews
  * @property Reviewer[] $reviewers
  */
-class SongGenre extends CActiveRecord {
-	public static function model($className = __CLASS__) {
+class SongGenre extends CActiveRecord
+{
+	public static function model($className = __CLASS__)
+    {
 		return parent::model($className);
 	}
 
-	public function tableName() {
+	public function tableName()
+    {
 		return 'song_genre';
 	}
 
-	public function rules() {
+	public function rules()
+    {
 		return array();
 	}
 
-	public function relations() {
+	public function relations()
+    {
 		return array(
-			'genre' => array(self::BELONGS_TO, 'Genre', 'genre_id'),
-			'song' => array(self::BELONGS_TO, 'Song', 'song_id'),
-			'reviews' => array(self::HAS_MANY, 'Review', 'song_id', 'through' => 'song'),
+			'genre'     => array(self::BELONGS_TO, 'Genre', 'genre_id'),
+			'song'      => array(self::BELONGS_TO, 'Song', 'song_id'),
+			'reviews'   => array(self::HAS_MANY, 'Review', 'song_id', 'through' => 'song'),
 			'reviewers' => array(self::HAS_MANY, 'Reviewer', 'reviewer_id', 'through' => 'review'),
 		);
 	}
 
-	public function attributeLabels() {
+	public function attributeLabels()
+    {
 		return array(
-			'song_id' => 'Song ID',
-			'genre_id' => 'Genre ID',
-			'is_primary' => 'Primary',
+			'song_id'       => 'Song ID',
+			'genre_id'      => 'Genre ID',
+			'is_primary'    => 'Primary',
 		);
 	}
 
-	public function search() {
+	public function search()
+    {
 		$criteria = new CDbCriteria();
 
 		$criteria->compare('song_id', $this->song_id, true);

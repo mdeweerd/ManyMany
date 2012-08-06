@@ -1,7 +1,11 @@
 <?php
 /**
  * Changes made for ClassMap:
- *  - Added public property CJoinQuery::$with 
+ *
+ * (Line 1373 and 1384)
+ *  - Added public property CJoinQuery::$with, which is filled with data in the __construct
+ *
+ * (Line 833-927)
  *  - Made changes to CJoinElement::runQuery so it does two additional COUNT queries 
  *    if you use a pager. (ie. a LIMIT and/or OFFSET are set) This way, the pager 
  *    works and all relevant data is returned.
@@ -833,50 +837,48 @@ class CJoinElement
 		$hasManies = false;
 		foreach($query->with as $with=>$value)
 		{
-			if(is_int($with))
-			{
-				if(is_string($value))
-					$with = explode('.',$value);
-			}
-			else
-			{
+			if(is_int($with)) {
+				if(is_string($value)) {
+                    $with = explode('.',$value);
+                }
+			} else {
 				$with = explode('.',$with);
 			}
 			$level = count($with)-1;
-			if($level==0)
-			{
+			if($level == 0) {
 				$rel = $this->model->relations();
-				if($rel[$with[0]][0]==='CHasManyRelation'||$rel[$with[0]][0]==='CManyManyRelation')
+				if($rel[$with[0]][0] === 'CHasManyRelation' || $rel[$with[0]][0] === 'CManyManyRelation') {
 					$hasManies = true;
-			}
-			elseif($level>0)
-			{
+                }
+			} elseif($level > 0) {
 				$model = $this->model;
 				$rel = $this->model->relations();
-				for($i=0;$i<$level;$i++)
-				{
+				for($i=0; $i<$level; $i+=1)
+                {
 					$model = new $rel[$with[$i]][1];
 					$rel = $model->relations();
-					if($rel[$with[$i+1]][0]==='CHasManyRelation'||$rel[$with[$i+1]][0]==='CManyManyRelation')
+					if($rel[$with[$i+1]][0] === 'CHasManyRelation' || $rel[$with[$i+1]][0] === 'CManyManyRelation') {
 						$hasManies = true;
+                    }
 				}
 			}
-			if(isset($value['select'])&&$value['select']===false)
+			if(isset($value['select']) && $value['select'] === false) {
 				$hasManies = false;
+            }
 		}
 		
-		if($hasManies && ($query->offset>0 || $query->limit>0))
-		{
+		if($hasManies && ($query->offset > 0 || $query->limit > 0)) {
+            Yii::trace('Using the CActiveFinder of classMap','<strong>ext.classMap.CActiveFinder</strong>');
+
 			$pk = $this->model->tableSchema->primaryKey;
 			$schema = $this->_builder->getSchema();
-			if(is_array($pk))
-			{
+			if(is_array($pk)) {
 				foreach($pk as $i=>$v)
-				$pk[$i] = $schema->quoteColumnName($this->model->tableAlias.'.'.$v);
+                {
+                    $pk[$i] = $schema->quoteColumnName($this->model->tableAlias.'.'.$v);
+                }
 				$group = array(implode(', ', $pk));
-			}
-			else
-			{
+			} else {
 				$group = array($schema->quoteColumnName($this->model->tableAlias.'.'.$this->model->tableSchema->primaryKey));
 			}
 			
@@ -886,35 +888,37 @@ class CJoinElement
 			$selectsForLimitOffset = $group;
 			$selectsForLimitOffset[] = 'COUNT(*) AS count';
 			
-			if($query->offset>0)
-			{
+			if($query->offset > 0) {
 				$query->selects = $selectsForLimitOffset;
 				$query->groups = $group;
 				$query->limit = $query->offset;
 				$query->offset = 0;
 				$offset = 0;
-				$command=$query->createCommand($this->_builder);
+				$command = $query->createCommand($this->_builder);
 				foreach($command->queryAll() as $row)
-					$offset += $row['count'];
+                {
+                    $offset += $row['count'];
+                }
 				$query->limit = $originLimit;
 				$query->offset = $originOffset;
 			}
-			if($query->limit>0)
-			{
+			if($query->limit > 0) {
 				$query->selects = $selectsForLimitOffset;
 				$query->groups = $group;
 				$limit = 0;
-				$command=$query->createCommand($this->_builder);
+				$command = $query->createCommand($this->_builder);
 				foreach($command->queryAll() as $row)
-					$limit += $row['count'];
-					
+                {
+                    $limit += $row['count'];
+                }					
 			}
-			if(isset($offset))
-				$query->offset = $offset;
-			if(isset($limit))
-				$query->limit = $limit;
-			if(isset($offset)||isset($limit))
-			{
+			if(isset($offset)) {
+                $query->offset = $offset;
+            }
+			if(isset($limit)) {
+                $query->limit = $limit;
+            }
+			if(isset($offset)||isset($limit)) {
 				$query->selects = $originSelects;
 				$query->groups = array();
 			}

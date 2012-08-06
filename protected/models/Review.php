@@ -10,37 +10,43 @@
  * @property Reviewer $reviewer
  * @property Song $song
  */
-class Review extends CActiveRecord {
+class Review extends CActiveRecord
+{
 	public $searchSong;
 	public $searchGenre;
 	public $allGenres;
 	
-	public static function model($className = __CLASS__) {
+	public static function model($className = __CLASS__)
+    {
 		return parent::model($className);
 	}
 
-	public function tableName() {
+	public function tableName()
+    {
 		return 'review';
 	}
 
-	public function rules() {
+	public function rules()
+    {
 		return array(
 			array('review', 'safe', 'on' => 'search'),
 		);
 	}
 
-	public function relations() {
+	public function relations()
+    {
 		return array(
-			'song' => array(self::BELONGS_TO, 'Song', 'song_id'),
-			'reviewer' => array(self::BELONGS_TO, 'Reviewer', 'reviewer_id'),
+			'song'      => array(self::BELONGS_TO, 'Song', 'song_id'),
+			'reviewer'  => array(self::BELONGS_TO, 'Reviewer', 'reviewer_id'),
 		);
 	}
 
-	public function attributeLabels() {
+	public function attributeLabels()
+    {
 		return array(
-			'reviewer_id' => 'Reviewer ID',
-			'song_id' => 'Song ID',
-			'review' => 'Review',
+			'reviewer_id'   => 'Reviewer ID',
+			'song_id'       => 'Song ID',
+			'review'        => 'Review',
 		);
 	}
 
@@ -48,7 +54,8 @@ class Review extends CActiveRecord {
 	 * search method to Lazy Load the has many relation
 	 * Advantage: It enables you to do stuff with data from the join table SongGenre
 	 */
-	public function search() {
+	public function searchOne()
+    {
 		$criteria = new CDbCriteria;
 		
 		/**
@@ -56,26 +63,35 @@ class Review extends CActiveRecord {
 		 * Not selecting any data from genres, because its lazy loaded anyway by Song::genreNames
 		 */
 		$criteria->with = array('song', 'song.genres'=>array('select'=>false));
-		$criteria->compare('genres.id', $this->searchGenre->id, true);
-		$criteria->compare('genres.name', $this->searchGenre->name, true);
-		
-		$criteria->group = 't.reviewer_id, t.song_id';
-		$criteria->together = true;
 
-		$criteria->compare('t.reviewer_id', $this->reviewer_id, true);
-		$criteria->compare('t.song_id', $this->song_id, true);
-		$criteria->compare('t.review', $this->review, true);
+        //Setting group so we're making sure the Pager works correctly
+        $criteria->group = 't.reviewer_id, t.song_id';
+        //Setting together to true, so we're using Yii's Eager loading method, even though 
+        //the genres are lazy loaded. Its still more efficient.
+        $criteria->together = true;
+
+        $criteria->compare('t.reviewer_id', $this->reviewer_id);    //Don't put the third parameter to true with ID's, because you don't want to partialMatch these..
+        $criteria->compare('t.song_id', $this->song_id);
+        $criteria->compare('t.review', $this->review, true);
+        
+		$criteria->compare('genres.id', $this->searchGenre->id);
+		$criteria->compare('genres.name', $this->searchGenre->name, true);
 		$criteria->compare('song.name', $this->searchSong->name, true);
 		$criteria->compare('song.artist', $this->searchSong->artist, true);
 		$criteria->compare('song.album', $this->searchSong->album, true);
 		
 		return new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
+            'pagination'=>array('pageSize'=>10),
         	'sort'=>array(
         		'defaultOrder'=>array(
         			'song_id'=>CSort::SORT_ASC,
         			),
         		'attributes'=>array(
+                    //Here we tell the CSort object how to sort specific attributes.
+                    //For example, here we tell that the CGridView column with the name 'song.name' can 
+                    //be sorted in an ascending and a descending way. The values of 'asc' and 'desc'
+                    //tell CSort what SQL to add for sorting. (Eg. `ORDER BY song.name DESC`)
         			'song.name'=>array(
         				'asc'=>'song.name',
         				'desc'=>'song.name DESC',
@@ -111,7 +127,8 @@ class Review extends CActiveRecord {
 	 * join table either.
 	 * Advantage: Most efficient eager loading
 	 */
-	public function search2() {
+	public function searchTwo()
+    {
 		$criteria = new CDbCriteria;
 	
 		/**
@@ -119,21 +136,22 @@ class Review extends CActiveRecord {
 		* Not selecting any data from genres, because its loaded using group_concat
 		*/
 		$criteria->with = array('song', 'song.genres'=>array('select'=>false));
-		$criteria->compare('genres.id', $this->searchGenre->id, true);
-		$criteria->compare('genres.name', $this->searchGenre->name, true);
+        $criteria->group = 't.reviewer_id, t.song_id';
+        $criteria->together = true;
+        
 		$criteria->select = array(
-			'GROUP_CONCAT(genres.name ORDER BY genres.name SEPARATOR \', \') AS allGenres',
+            //You don't need to select primary keys, they are automatically added.
+            //The column allGenres has to be a public property in the Model.
+			"GROUP_CONCAT(genres.name ORDER BY genres.name SEPARATOR ', ') AS allGenres",
 			't.review',
-			//PK's arent needed in here, they are automatically added.
 		);
 		
-		
-		$criteria->group = 't.reviewer_id, t.song_id';
-		$criteria->together = true;
-		
-		$criteria->compare('t.reviewer_id', $this->reviewer_id, true);
-		$criteria->compare('t.song_id', $this->song_id, true);
+		$criteria->compare('t.reviewer_id', $this->reviewer_id);
+		$criteria->compare('t.song_id', $this->song_id);
 		$criteria->compare('t.review', $this->review, true);
+
+        $criteria->compare('genres.id', $this->searchGenre->id);
+        $criteria->compare('genres.name', $this->searchGenre->name, true);
 		$criteria->compare('song.name', $this->searchSong->name, true);
 		$criteria->compare('song.artist', $this->searchSong->artist, true);
 		$criteria->compare('song.album', $this->searchSong->album, true);
@@ -172,24 +190,26 @@ class Review extends CActiveRecord {
 	 * So the Pager works and all of the data is returned.
 	 * The custom CActiveFinder is loaded in the index.php using classMap.
 	 */
-	public function search3() {
+	public function searchThree()
+    {
 		$criteria = new CDbCriteria;
 	
 		/**
-		* Note, if you Eager Load, and someone searched for a genre, only THAT genre is shown.
-		* If the Song has another Genre, its not shown.
-		* Note that in this usecase, you compare to genre, not genres.
-		*/
+         * Note, if you Eager Load, and someone searched for a genre, only THAT genre is shown.
+         * If the Song has another Genre, its not shown.
+         * Note that in this usecase, you compare to genre, not genres.
+         * We also don't have to set a group, since the custom CActiveFinder takes care of that.
+		 */
 		$criteria->with = array('song', 'song.hasGenres', 'song.hasGenres.genre');
-		$criteria->compare('genre.id', $this->searchGenre->id, true);
-		$criteria->compare('genre.name', $this->searchGenre->name, true);
-	
-		$criteria->together = true;
-	
-		$criteria->compare('t.reviewer_id', $this->reviewer_id, true);
-		$criteria->compare('t.song_id', $this->song_id, true);
+        $criteria->together = true;
+        
+		$criteria->compare('t.reviewer_id', $this->reviewer_id);
+		$criteria->compare('t.song_id', $this->song_id);
 		$criteria->compare('t.review', $this->review, true);
-		$criteria->compare('song.name', $this->searchSong->name, true);
+        
+        $criteria->compare('genre.id', $this->searchGenre->id);
+        $criteria->compare('genre.name', $this->searchGenre->name, true);
+        $criteria->compare('song.name', $this->searchSong->name, true);
 		$criteria->compare('song.artist', $this->searchSong->artist, true);
 		$criteria->compare('song.album', $this->searchSong->album, true);
 	

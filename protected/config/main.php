@@ -11,17 +11,11 @@ return call_user_func(
 	 */
 	function () {
 
-		/** @var string[] $extras List of paths to subsidiary config files */
-		$extras = array(
-			__DIR__ . '/local.php',
-			__DIR__ . '/passwords.php'
-		);
-
 		/** @var array $cfg The application's base configuration */
 		$cfg = array(
 			'name' => 'Many Many CGV',
 			'basePath' => __DIR__ . DIRECTORY_SEPARATOR . '..',
-			'runtimePath' => __DIR__ . '/../../../runtime',
+			'runtimePath' => __DIR__ . '/../runtime',
 
 			'preload' => array('log'),
 
@@ -43,22 +37,24 @@ return call_user_func(
 					// enable cookie-based authentication
 					'allowAutoLogin' => true,
 				),
-				/*
+
 			 'urlManager'=>array(
 				 'urlFormat'=>'path',
+                 'showScriptName'=>false,
 				 'rules'=>array(
 					 '<controller:\w+>/<id:\d+>'=>'<controller>/view',
 					 '<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',
 					 '<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
 				 ),
 			 ),
-			 */
+
 				'db' => array(
-					'connectionString' => 'mysql:host=localhost;dbname=many_many',
+					'connectionString' => 'mysql:host=localhost;dbname=manymany',
 					'emulatePrepare' => true,
-					'username' => '',
-					'password' => '',
+					'username' => 'root',
+					'password' => 'root',
 					'charset' => 'utf8',
+                    'enableProfiling'=>false,
 					'enableParamLogging' => true,
 				),
 				'errorHandler' => array(
@@ -68,8 +64,7 @@ return call_user_func(
 					'class' => 'CLogRouter',
 					'routes' => array(
 						'file' => array(
-							'class' => 'CFileLogRoute',
-							'levels' => 'error, warning',
+							'class' => 'CWebLogRoute',
 						),
 					),
 				),
@@ -78,14 +73,6 @@ return call_user_func(
 			'params' => array(
 			),
 		);
-
-		// Merge extra config arrays in subsiary config files in $extra into $cfg.
-		foreach ($extras as $file) {
-			$moreCfg = @include($file);
-			if (is_array($moreCfg) && $moreCfg) {
-				$cfg = CMap::mergeArray($cfg, $moreCfg);
-			}
-		}
 
 		return $cfg;
 	}
