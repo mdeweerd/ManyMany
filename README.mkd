@@ -1,7 +1,7 @@
 # ManyMany
 ## A Yii app for experimenting with complex grid views
 
-The app shows four ways of how to display related data in a fully functional gridview. We (_tom[]_ and _yjeroen_) have been working on this to show fellow Yii users what the possibilities are.
+The app shows four ways of how to display related data in a fully functional gridview. We (_tom[]_ and _yjeroen_ from the #yii chatroom) have been working on this to show fellow Yii users what the possibilities are. I would also like to thank _tom[]_ for giving me these code challenges.
 
 You can find a DEMO at: [http://yiitryout.site90.net/ManyMany/](http://yiitryout.site90.net/ManyMany/)
 
@@ -192,7 +192,7 @@ _Note: I didn't test this custom CActiveFinder as much as the KeenLoading extens
 
 **Explanation**  
 Related data is loaded in a keen fashion. Using KeenActiveDataProvider, the related models are loaded in a separate query and then put into the relation properties of the earlier loaded models.  
-In your Models search function, you return a new KeenActiveDataProvider, instead of a CActiveDataProvider. The KeenActiveDataProvider has another option named 'withKeenLoading', where you can set the relations that you want to load in a second(or multiple) queries.
+In your Models search function, you return a new KeenActiveDataProvider, instead of a CActiveDataProvider. The KeenActiveDataProvider has another option named 'withKeenLoading', where you can set the relations that you want to load in a second(or multiple) queries.  
 An example:
 ```php
 <?php
