@@ -1,7 +1,5 @@
 <?php
 
-Yii::setPathOfAlias('shared', realpath(__DIR__ . '/../../../shared'));
-
 return call_user_func(
 
 	/**
@@ -14,8 +12,8 @@ return call_user_func(
 		/** @var array $cfg The application's base configuration */
 		$cfg = array(
 			'name' => 'Many Many CGV',
-			'basePath' => __DIR__ . DIRECTORY_SEPARATOR . '..',
-			'runtimePath' => __DIR__ . '/../runtime',
+			'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..',
+			'runtimePath' => dirname(__FILE__) . '/../runtime',
 
 			'preload' => array('log'),
 

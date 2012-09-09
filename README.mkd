@@ -51,7 +51,7 @@ The easiest way to fix this, is to group by the primary key(s) of your main mode
     $criteria->group = 't.id';
 	$criteria->together = true;
 ```
-Reference: [Review::searchOne()](https://github.com/tom--/ManyMany/blob/yj-KeenLoading/protected/models/Review.php#L62)
+Reference: [Review::searchOne()](https://github.com/yjeroen/ManyMany/blob/master/protected/models/Review.php#L59)
 
 ### 1.2 Sorting
 When you have a column in your CGridView that isn't an attribute of the model, Yii doesn't automatically know how to sort. But we can tell the `sort` parameter of the CActiveDataProvider how.  
@@ -74,8 +74,8 @@ You have to add the attribute called `song.album` to the attributes array of 'so
         ),
 	));
 ```
-Reference:  [views/review/_caseOneGrid](https://github.com/tom--/ManyMany/blob/yj-KeenLoading/protected/views/review/_caseOneGrid.php#L28), 
-            [Review::searchOne()](https://github.com/tom--/ManyMany/blob/yj-KeenLoading/protected/models/Review.php#L88)
+Reference:  [views/review/_caseOneGrid](https://github.com/yjeroen/ManyMany/blob/master/protected/views/review/_caseOneGrid.php#L28), 
+            [Review::searchOne()](https://github.com/yjeroen/ManyMany/blob/master/protected/models/Review.php#L103)
 
 
 ### 1.3 Filtering
@@ -115,10 +115,10 @@ Here, we simply add extra `$criteria->compare()`'s for the column we want to fil
     $criteria->compare('song.name', $this->searchSong->name, true);
 ```
 
-Reference:  [ReviewController::actionCaseOne()](https://github.com/tom--/ManyMany/blob/yj-KeenLoading/protected/controllers/ReviewController.php#L11), 
-            [Review::$searchSong](https://github.com/tom--/ManyMany/blob/yj-KeenLoading/protected/models/Review.php#L14), 
-            [views/review/_caseOneGrid](https://github.com/tom--/ManyMany/blob/yj-KeenLoading/protected/views/review/_caseOneGrid.php#L21), 
-            [Review::searchOne()](https://github.com/tom--/ManyMany/blob/yj-KeenLoading/protected/models/Review.php#L68)
+Reference:  [ReviewController::actionCaseOne()](https://github.com/yjeroen/ManyMany/blob/master/protected/controllers/ReviewController.php#L10), 
+            [Review::$searchSong](https://github.com/yjeroen/ManyMany/blob/master/protected/models/Review.php#L15), 
+            [views/review/_caseOneGrid](https://github.com/yjeroen/ManyMany/blob/master/protected/views/review/_caseOneGrid.php#L21), 
+            [Review::searchOne()](https://github.com/yjeroen/ManyMany/blob/master/protected/models/Review.php#L79)
 
 2. UseCases
 ---------
@@ -183,7 +183,7 @@ _Note: I didn't test this custom CActiveFinder as much as the KeenLoading extens
 ### 2.4 UseCase Four - KeenLoading
 
 **Files/Methods**
-- components/KeenActiveDataProvider
+- [components/KeenActiveDataProvider](https://github.com/yjeroen/ManyMany/blob/master/protected/components/KeenActiveDataProvider.php)
 - models/Song::search()
 - controllers/SongController::actionSongs()
 - controllers/SongController::setSearchInputs()
@@ -206,7 +206,7 @@ _2nd Note: You can also look at SongController::setSearchInputs() to take a look
 
 3. Extra: Full explanation of KeenActiveDataProvider
 ---------
-KeenActiveDataProvider implements a data provider based on ActiveRecord and is extended from CActiveDataProvider.
+[KeenActiveDataProvider](https://github.com/yjeroen/ManyMany/blob/master/protected/components/KeenActiveDataProvider.php) implements a data provider based on ActiveRecord and is extended from CActiveDataProvider.
 
 KeenActiveDataProvider provides data in terms of ActiveRecord objects. It uses 
 the `CActiveRecord::findAll` method to retrieve the data from database. 
