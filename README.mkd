@@ -1,7 +1,9 @@
 # ManyMany
 ## A Yii app for experimenting with complex grid views
 
-The app shows four ways of implementing the loading of related data in a gridview.
+The app shows four ways of how to display related data in a fully functional gridview. We (_tom[]_ and _yjeroen_) have been working on this to show fellow Yii users what the possibilities are.
+
+You can find a DEMO at: [http://yiitryout.site90.net/ManyMany/](http://yiitryout.site90.net/ManyMany/)
 
 All gridviews have working implementations of [paging, sorting and filtering](#1-cgridview-paging-sorting-and-filtering).
 
@@ -170,12 +172,13 @@ _Note: In addition, you can look at _caseTwoGrid.php to see how you can use a dr
 
 **Explanation**  
 Using classMap you import a custom CActiveFinder that enhances the eager loading magic of Yii. Easiest, but the disadvantage is that it does another 2 COUNT queries for the pager to work. Like the normal Eager loading way of Yii, this can become data inefficient in some cases.  
-The extra COUNT queries will only be performed when:
-1. the primary table is joined with HAS_MANY or MANY_MANY relations
-2. Columns of those relations are selected
-3. $criteria->group has been set
+The extra COUNT queries will only be performed when:  
+1. the primary table is joined with HAS_MANY or MANY_MANY relations  
+2. Columns of those relations are selected  
+3. $criteria->group has been set  
 4. $criteria->together has been set to true  
 
+_Note: I didn't test this custom CActiveFinder as much as the KeenLoading extension._
 
 ### 2.4 UseCase Four - KeenLoading
 
