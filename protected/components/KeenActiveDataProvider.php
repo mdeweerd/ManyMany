@@ -3,21 +3,21 @@
  * KeenActiveDataProvider implements a data provider based on ActiveRecord and is
  * extended from CActiveDataProvider.
  *
- * KeenActiveDataProvider provides data in terms of ActiveRecord objects. It uses 
- * the AR {@link CActiveRecord::findAll} method to retrieve the data from database. 
- * The {@link criteria} property can be used to specify various query options. If 
- * you add a 'with' option to the criteria, and the same relations are added to the 
- * 'withKeenLoading' option, they will be automatically set to select no columns. 
+ * KeenActiveDataProvider provides data in terms of ActiveRecord objects. It uses
+ * the AR {@link CActiveRecord::findAll} method to retrieve the data from database.
+ * The {@link criteria} property can be used to specify various query options. If
+ * you add a 'with' option to the criteria, and the same relations are added to the
+ * 'withKeenLoading' option, they will be automatically set to select no columns.
  * ie. array('author'=>array('select'=>false)
  *
  * HAS_ONE and BELONG_TO type relations should not be set in withKeenLoading,
  * but in the $criteria->with, because its more efficient to load them in the
  * normal query.
- * 
+ *
  * There will be a CDbCriteria->group set automatically, that groups the model
  * to its own primary keys.
- * 
- * The relation names you specify in the 'withKeenLoading' property of the 
+ *
+ * The relation names you specify in the 'withKeenLoading' property of the
  * configuration array will be loaded in a keen fashion. A separate database
  * query will be done to pull the data of those specified related models.
  *
@@ -50,6 +50,8 @@ class KeenActiveDataProvider extends CActiveDataProvider
 
     private $_withKeenLoading = array();
 
+    public $extrakeys = array();
+
     /**
      * Constructor.
      * Can change $config, before calling CActiveDataProvider's __construct.
@@ -59,10 +61,10 @@ class KeenActiveDataProvider extends CActiveDataProvider
      */
     public function __construct($modelClass, $config=array())
     {
-        tr('constructing!','constructing!');
+        //tr('constructing!','constructing!');
         parent::__construct($modelClass, $config);
     }
-    
+
     /*
      * Specifies which related objects should be Keenly loaded.
      * This method takes variable number of parameters. Each parameter specifies
@@ -160,7 +162,7 @@ class KeenActiveDataProvider extends CActiveDataProvider
                 if(is_integer($k) && (strpos($v,'.') !== false
                     || (!$this->model->metaData->relations[$v] instanceof CHasOneRelation
                         && !$this->model->metaData->relations[$v] instanceof CBelongsToRelation))
-                    || !is_integer($k) && (strpos($k,'.') !== false 
+                    || !is_integer($k) && (strpos($k,'.') !== false
                     || (!$this->model->metaData->relations[$k] instanceof CHasOneRelation
                         && !$this->model->metaData->relations[$k] instanceof CBelongsToRelation))) {
                     foreach($this->_withKeenLoading as $groupedKeen)
@@ -191,9 +193,10 @@ class KeenActiveDataProvider extends CActiveDataProvider
             }
 
             $pkNames = (array)$this->model->tableSchema->primaryKey;
+            $schema=$this->model->getDbConnection()->getSchema();
             foreach($pkNames as $k=>$v)
             {
-                $pkNames[$k] = $this->model->tableAlias.'.'.$v;
+                $pkNames[$k] = $schema->quoteColumnName($this->model->tableAlias.'.'.$v);
             }
             $this->criteria->group = implode(',', $pkNames);
         }
@@ -231,7 +234,7 @@ class KeenActiveDataProvider extends CActiveDataProvider
         {
             if(!empty($keenGroup)) {
                 $relatedModels = $this->model->findAllByAttributes($pks,
-                    array('select'=>$this->criteria->group,
+                    array('select'=>array_merge($this->extrakeys,CPropertyValue::ensureArray(explode(',',$this->criteria->group))),
                           'with'=>$keenGroup)
                 );
                 foreach($data as $model)

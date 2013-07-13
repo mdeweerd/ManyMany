@@ -45,8 +45,12 @@ return call_user_func(
 					 '<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
 				 ),
 			 ),
-
-				'db' => array(
+			  'dbsqlite'=>array(
+			  ),'db'=>array( /* Move this line to appropriate location so that 'db' is defined to the prefered database.*/
+			  'connectionString' => 'sqlite:protected/data/many_many.db',
+			    //'tablePrefix' => 'tbl_',
+			  ),
+			  'dbmysql'=>array(
 					'connectionString' => 'mysql:host=localhost;dbname=manymany',
 					'emulatePrepare' => true,
 					'username' => 'root',
