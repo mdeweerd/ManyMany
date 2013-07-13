@@ -234,7 +234,7 @@ class KeenActiveDataProvider extends CActiveDataProvider
         {
             if(!empty($keenGroup)) {
                 $relatedModels = $this->model->findAllByAttributes($pks,
-                    array('select'=>array_merge($this->extrakeys,CPropertyValue::ensureArray(explode(',',$this->criteria->group))),
+                    array('select'=>array_merge($this->extrakeys,is_array($this->criteria->group)?$this->criteria->group:explode(',',$this->criteria->group)),
                           'with'=>$keenGroup)
                 );
                 foreach($data as $model)
